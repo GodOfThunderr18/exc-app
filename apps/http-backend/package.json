@@ -10,11 +10,13 @@
     "dev:watch": "tsc -b --watchrt"
   },
   "dependencies": {
-    "@types/jsonwebtoken": "^9.0.10",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
     "@repo/backend-common": "workspace:*",
-    "@repo/common": "workspace:*"
+    "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.10",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
