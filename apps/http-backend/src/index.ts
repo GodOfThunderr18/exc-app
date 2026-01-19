@@ -123,6 +123,62 @@ app.post("/room",middleware,async (req, res) => {
      }
 });
 
+
+app.get("/chats/:roomId", async (req, res) => {
+    try {
+        const roomId = Number(req.params.roomId);
+        console.log(req.params.roomId);
+        const messages = await prisma.chat.findMany({
+            where: {
+                roomId: roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 1000
+        });
+
+        res.json({
+            messages
+        })
+    } catch(e) {
+        console.log(e);
+        res.json({
+            messages: []
+        })
+    }
+    
+})
+
+app.get("/room/:slug", async (req, res) => {
+    try {
+        const slug = req.params.slug;
+        const room = await prisma.room.findFirst({
+            where: {
+                slug
+            }
+        });
+
+        if (!room) {
+            res.status(404).json({
+                message: "Room not found",
+                error: "ROOM_NOT_FOUND"
+            });
+            return;
+        }
+
+        res.json({
+            room
+        });
+    } catch (e) {
+        console.log("Database error:", e);
+        res.status(500).json({
+            message: "Error fetching room"
+        });
+    }
+})
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
