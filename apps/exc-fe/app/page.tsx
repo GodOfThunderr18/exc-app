@@ -12,7 +12,7 @@ function App() {
       <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/20 rounded-full blur-[120px] animate-pulse-glow pointer-events-none" style={{ animationDelay: "2s" }} />
       
       {/* Navbar */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl">
         <div className="relative">
           {/* Navbar glow effect */}
           <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500/20 via-cyan-500/20 to-purple-500/20 rounded-2xl blur-sm" />
@@ -28,8 +28,8 @@ function App() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">Excalidraw</span>
-                  <span className="text-[10px] text-zinc-500 font-medium tracking-wider uppercase hidden sm:block">Infinite Canvas</span>
+                  <span className="text-lg font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">CanvasSync</span>
+                  <span className="text-[10px] text-zinc-500 font-medium tracking-wider uppercase hidden sm:block">Where Ideas Flow</span>
                 </div>
               </div>
 
@@ -358,7 +358,7 @@ function App() {
                 <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
                   <Pencil className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">Excalidraw</span>
+                <span className="text-xl font-bold text-white">CanvasSync</span>
               </div>
               <p className="text-sm text-zinc-500 max-w-xs">
                 The simplest way to create beautiful diagrams and collaborate with your team in real-time.
@@ -401,7 +401,7 @@ function App() {
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-800/50">
             <p className="text-sm text-zinc-600">
-              © 2026 Excalidraw Clone. All rights reserved.
+              © 2026 CanvasSync. All rights reserved.
             </p>
             <p className="text-sm text-zinc-600">
               Made with 💜 for creators everywhere
