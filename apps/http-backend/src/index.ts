@@ -11,10 +11,12 @@ import { JWT_SECRET } from "@repo/backend-common";
 import { middleware } from "./middleware";
 import {CreateUserSchema,SigninSchema,CreateRoomSchema} from "@repo/common/types";
 import bcrypt from "bcrypt";
+import cors from "cors";
 const { prisma } = require("@repo/db");
 const app = express();
 const PORT = 3001;
 app.use(express.json());
+app.use(cors());
 
 
 
