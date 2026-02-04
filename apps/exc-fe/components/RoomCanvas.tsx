@@ -12,6 +12,9 @@ export function RoomCanvas({roomId}: {roomId: string}) {
     const router = useRouter();
 
     useEffect(() => {
+        let ws: WebSocket | null = null;
+        let isCancelled = false;
+
         const token = localStorage.getItem("token");
         
         if (!token) {
@@ -19,33 +22,50 @@ export function RoomCanvas({roomId}: {roomId: string}) {
             return;
         }
 
-        const ws = new WebSocket(`${WS_URL}?token=${token}`);
+        // Small delay to ensure component is fully mounted after navigation
+        const timeoutId = setTimeout(() => {
+            if (isCancelled) return;
+            
+            ws = new WebSocket(`${WS_URL}?token=${token}`);
 
-        ws.onopen = () => {
-            setSocket(ws);
-            const data = JSON.stringify({
-                type: "join_room",
-                roomId
-            });
-            console.log(data);
-            ws.send(data)
-        }
-
-        ws.onerror = (e) => {
-            console.error("WebSocket error:", e);
-            setError("Failed to connect to server. Make sure the WebSocket server is running on ws://localhost:8080");
-        }
-
-        ws.onclose = (e) => {
-            console.log("WebSocket closed:", e.code, e.reason);
-            if (!socket) {
-                setError("Connection closed. Server may be down.");
+            ws.onopen = () => {
+                if (isCancelled) {
+                    ws?.close();
+                    return;
+                }
+                setSocket(ws);
+                const data = JSON.stringify({
+                    type: "join_room",
+                    roomId
+                });
+                console.log(data);
+                ws?.send(data)
             }
-            setSocket(null);
-        }
+
+            ws.onerror = (e) => {
+                console.error("WebSocket error event:", e);
+            }
+
+            ws.onclose = (e) => {
+                console.log("WebSocket closed - code:", e.code, "reason:", e.reason, "wasClean:", e.wasClean);
+                // Only show error if not intentionally cancelled
+                if (!isCancelled) {
+                    if (e.code === 1006) {
+                        setError("Connection failed. Check if token is valid and server is running on ws://localhost:8080");
+                    } else if (e.code !== 1000) {
+                        setError("Connection closed unexpectedly.");
+                    }
+                }
+                setSocket(null);
+            }
+        }, 100);
 
         return () => {
-            ws.close();
+            isCancelled = true;
+            clearTimeout(timeoutId);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close(1000, "Component unmounting");
+            }
         }
         
     }, [roomId])
