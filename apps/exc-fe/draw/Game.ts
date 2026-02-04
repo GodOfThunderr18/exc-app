@@ -14,10 +14,7 @@ type Shape = {
     radius: number;
 } | {
     type: "pencil";
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
+    points: { x: number; y: number }[];
 }
 
 export class Game {
@@ -30,6 +27,7 @@ export class Game {
     private startX = 0;
     private startY = 0;
     private selectedTool: Tool = "circle";
+    private currentPencilPoints: { x: number; y: number }[] = [];
 
     socket: WebSocket;
 
@@ -85,11 +83,24 @@ export class Game {
                 this.ctx.strokeStyle = "rgba(255, 255, 255)"
                 this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
             } else if (shape.type === "circle") {
-                console.log(shape);
+                this.ctx.strokeStyle = "rgba(255, 255, 255)"
                 this.ctx.beginPath();
                 this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
                 this.ctx.stroke();
                 this.ctx.closePath();                
+            } else if (shape.type === "pencil" && shape.points.length > 0) {
+                this.ctx.strokeStyle = "rgba(255, 255, 255)"
+                this.ctx.lineWidth = 2;
+                this.ctx.lineCap = "round";
+                this.ctx.lineJoin = "round";
+                this.ctx.beginPath();
+                this.ctx.moveTo(shape.points[0].x, shape.points[0].y);
+                for (let i = 1; i < shape.points.length; i++) {
+                    this.ctx.lineTo(shape.points[i].x, shape.points[i].y);
+                }
+                this.ctx.stroke();
+                this.ctx.closePath();
+                this.ctx.lineWidth = 1;
             }
         })
     }
@@ -98,6 +109,11 @@ export class Game {
         this.clicked = true
         this.startX = e.clientX
         this.startY = e.clientY
+        
+        // Start pencil drawing
+        if (this.selectedTool === "pencil") {
+            this.currentPencilPoints = [{ x: e.clientX, y: e.clientY }];
+        }
     }
     mouseUpHandler = (e: { clientX: number; clientY: number; }) => {
         this.clicked = false
@@ -123,6 +139,12 @@ export class Game {
                 centerX: this.startX + radius,
                 centerY: this.startY + radius,
             }
+        } else if (selectedTool === "pencil" && this.currentPencilPoints.length > 1) {
+            shape = {
+                type: "pencil",
+                points: [...this.currentPencilPoints]
+            }
+            this.currentPencilPoints = [];
         }
 
         if (!shape) {
@@ -146,7 +168,7 @@ export class Game {
             this.clearCanvas();
             this.ctx.strokeStyle = "rgba(255, 255, 255)"
             const selectedTool = this.selectedTool;
-            console.log(selectedTool)
+            
             if (selectedTool === "rect") {
                 this.ctx.strokeRect(this.startX, this.startY, width, height);   
             } else if (selectedTool === "circle") {
@@ -157,6 +179,24 @@ export class Game {
                 this.ctx.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
                 this.ctx.stroke();
                 this.ctx.closePath();                
+            } else if (selectedTool === "pencil") {
+                // Add point to current stroke
+                this.currentPencilPoints.push({ x: e.clientX, y: e.clientY });
+                
+                // Draw current pencil stroke
+                if (this.currentPencilPoints.length > 0) {
+                    this.ctx.lineWidth = 2;
+                    this.ctx.lineCap = "round";
+                    this.ctx.lineJoin = "round";
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.currentPencilPoints[0].x, this.currentPencilPoints[0].y);
+                    for (let i = 1; i < this.currentPencilPoints.length; i++) {
+                        this.ctx.lineTo(this.currentPencilPoints[i].x, this.currentPencilPoints[i].y);
+                    }
+                    this.ctx.stroke();
+                    this.ctx.closePath();
+                    this.ctx.lineWidth = 1;
+                }
             }
         }
     }
